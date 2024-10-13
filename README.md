@@ -230,32 +230,21 @@ Pada bagian ini, kami menggunakan beberapa metrik evaluasi untuk menilai kinerja
 ### Metrik Evaluasi yang Digunakan
 
 1. **Accuracy**  
-   Akurasi adalah proporsi prediksi yang benar dari seluruh prediksi. Akurasi dihitung dengan rumus:
-   \[
-   \text{Accuracy} = \frac{\text{True Positives} + \text{True Negatives}}{\text{Total Observations}}
-   \]
-   Meskipun akurasi menunjukkan performa keseluruhan, pada data yang tidak seimbang, seperti kasus prediksi hujan, akurasi mungkin kurang representatif karena model bisa lebih banyak memprediksi kelas mayoritas.
+   Akurasi adalah proporsi prediksi yang benar dari seluruh prediksi. Akurasi dihitung dengan rumus:  
+   `Accuracy = (True Positives + True Negatives) / Total Observations`
 
 2. **Precision**  
-   Precision mengukur akurasi prediksi positif dengan rumus:
-   \[
-   \text{Precision} = \frac{\text{True Positives}}{\text{True Positives} + \text{False Positives}}
-   \]
-   Precision penting dalam kasus ini untuk memastikan bahwa model tidak terlalu banyak memprediksi hujan secara salah, yang bisa menimbulkan dampak operasional.
+   Precision mengukur akurasi prediksi positif dengan rumus:  
+   `Precision = True Positives / (True Positives + False Positives)`
 
 3. **Recall**  
-   Recall mengukur kemampuan model dalam mendeteksi semua kejadian positif (hujan) dengan rumus:
-   \[
-   \text{Recall} = \frac{\text{True Positives}}{\text{True Positives} + \text{False Negatives}}
-   \]
-   Recall penting dalam kasus ini karena kita ingin model dapat menangkap semua kemungkinan terjadinya hujan demi keselamatan dan perencanaan.
+   Recall mengukur kemampuan model dalam mendeteksi semua kejadian positif (hujan) dengan rumus:  
+   `Recall = True Positives / (True Positives + False Negatives)`
 
 4. **F1-Score**  
-   F1-Score adalah rata-rata harmonik dari precision dan recall, yang memberikan keseimbangan di antara keduanya, khususnya berguna pada data yang tidak seimbang.
-   \[
-   \text{F1-Score} = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
-   \]
-   F1-Score membantu melihat performa keseluruhan pada data yang tidak seimbang dengan memberikan skor seimbang antara presisi dan sensitivitas.
+   F1-Score adalah rata-rata harmonik dari precision dan recall, yang memberikan keseimbangan di antara keduanya, khususnya berguna pada data yang tidak seimbang.  
+   `F1-Score = 2 * (Precision * Recall) / (Precision + Recall)`
+
 
 ### Hasil Proyek Berdasarkan Metrik Evaluasi
 
