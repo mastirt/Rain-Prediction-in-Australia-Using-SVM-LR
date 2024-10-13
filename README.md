@@ -143,7 +143,7 @@ Pada bagian ini, dijelaskan tahapan-tahapan persiapan data yang dilakukan untuk 
    - **Alasan**: Split data diperlukan untuk memastikan model tidak hanya belajar dari data latih, tetapi juga mampu bekerja dengan baik pada data baru yang belum pernah dilihat sebelumnya. Pembagian ini juga membantu mengevaluasi generalisasi model pada data uji.
 
 ### 6. Improvement pada Data
-   Peningkatan akurasi model dilakukan dengan teknik penyeimbangan data menggunakan *SMOTE* dan *class_weight* pada model SVM:
+   Peningkatan akurasi model dilakukan dengan teknik penyeimbangan data menggunakan *SMOTE* dan *class_weight* pada model SVM maupun Logistic Regression:
    - **SMOTE (Synthetic Minority Over-sampling Technique)**: Digunakan untuk menangani ketidakseimbangan kelas dengan membuat sampel sintetis dari kelas minoritas.
    - **class_weight='balanced'**: Mengatur bobot kelas secara otomatis untuk memperhitungkan ketidakseimbangan, sehingga model lebih memperhatikan kelas yang kurang dominan.
 
