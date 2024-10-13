@@ -113,10 +113,11 @@ Data yang digunakan memliki ukuran **145460, 23**. Terdapat kolom yang berisikan
 Dataset ini memiliki nilai kosong yang signifikan pada beberapa kolom seperti *Evaporation*, *Sunshine*, *Cloud9am*, dan *Cloud3pm*, yang mungkin memerlukan penanganan lebih lanjut seperti imputasi atau penghapusan baris/kolom tergantung pada strategi pengolahan data yang diinginkan.
 
 ### correlation matrix heatmap plot
-Melihat apakah dari kolom yang ada terdapat korelasi antara kolom lain. ![Korelasi Matrik](/assets/KorelasiMatrik.png)
+Melihat apakah dari kolom yang ada terdapat korelasi antara kolom lain. ![KorelasiMatrik](https://github.com/user-attachments/assets/05a2e9e3-6c3d-4006-925f-844666c20670)
 
 ### Rainfall Over Time
-Menganalisis tingkat curah hujan dari tahun 2008 hingga 2018. Dapat diilihat curah hujan selalu naik diawal tahun. ![Rainfall](/assets/Rainfall.png)
+Menganalisis tingkat curah hujan dari tahun 2008 hingga 2018. Dapat diilihat curah hujan selalu naik diawal tahun. ![Rainfall](https://github.com/user-attachments/assets/d07de9c2-46a2-4ff6-aebc-02ef8ce34e5e)
+
 
 ## Data Preparation
 Pada bagian ini, dijelaskan tahapan-tahapan persiapan data yang dilakukan untuk memastikan data siap digunakan dalam proses pemodelan. Berikut adalah tahapan lengkap dalam *Data Preparation*:
@@ -140,6 +141,12 @@ Pada bagian ini, dijelaskan tahapan-tahapan persiapan data yang dilakukan untuk 
 ### 5. Split Data (70:30)
    - **Proses**: Memisahkan data menjadi data latih (*train*) dan data uji (*test*) dengan perbandingan 70:30. Data latih digunakan untuk melatih model, sedangkan data uji digunakan untuk mengevaluasi performa model.
    - **Alasan**: Split data diperlukan untuk memastikan model tidak hanya belajar dari data latih, tetapi juga mampu bekerja dengan baik pada data baru yang belum pernah dilihat sebelumnya. Pembagian ini juga membantu mengevaluasi generalisasi model pada data uji.
+
+### 6. Improvement pada Data
+   Peningkatan akurasi model dilakukan dengan teknik penyeimbangan data menggunakan *SMOTE* dan *class_weight* pada model SVM:
+   - **SMOTE (Synthetic Minority Over-sampling Technique)**: Digunakan untuk menangani ketidakseimbangan kelas dengan membuat sampel sintetis dari kelas minoritas.
+   - **class_weight='balanced'**: Mengatur bobot kelas secara otomatis untuk memperhitungkan ketidakseimbangan, sehingga model lebih memperhatikan kelas yang kurang dominan.
+
    
 Setiap tahapan di atas dilakukan secara berurutan untuk memastikan data siap digunakan dalam proses pemodelan.
 
