@@ -28,23 +28,17 @@ Beberapa studi mendukung pendekatan ini:
 
 Perubahan cuaca yang ekstrem di Australia, khususnya hujan yang sulit diprediksi, mempengaruhi berbagai sektor yang bergantung pada kondisi cuaca, seperti pertanian, transportasi, dan infrastruktur. Ketidakpastian dalam pola hujan mengakibatkan risiko kerugian ekonomi dan keamanan, seperti banjir yang tiba-tiba dan kekeringan berkepanjangan. Mampu memprediksi hujan sehari sebelumnya akan membantu sektor-sektor ini dalam melakukan perencanaan yang lebih baik, mengurangi risiko, dan meningkatkan efisiensi.
 
-Bagian laporan ini mencakup:
-
 ### Problem Statements
 
-Menjelaskan pernyataan masalah latar belakang:
 - **Bagaimana model prediksi dapat memberikan informasi yang akurat untuk mendukung perencanaan di sektor pertanian?**
 - **Apakah prediksi hujan harian dapat mengurangi risiko dan meningkatkan keamanan dalam operasional transportasi dan infrastruktur?**
 - **Seberapa efektif prediksi cuaca yang akurat dalam mendukung mitigasi bencana dan perencanaan perkotaan di Australia?**
 
 ### Goals
 
-Menjelaskan tujuan dari pernyataan masalah:
 - Mengurangi risiko kerugian dalam sektor pertanian melalui perencanaan penyiraman dan panen yang lebih baik.
 - Meningkatkan keamanan dan efisiensi dalam sektor transportasi dan infrastruktur.
 - Menyediakan informasi yang dapat diandalkan untuk perencanaan perkotaan dan mitigasi risiko bencana.
-
-Semua poin di atas harus diuraikan dengan jelas. Anda bebas menuliskan berapa pernyataan masalah dan juga goals yang diinginkan.
 
 ### Solution Statement
 Untuk mencapai tujuan di atas, beberapa solusi dapat diterapkan:
@@ -88,6 +82,36 @@ Dataset yang digunakan berasal dari kaggle bernama [Rain in Australia](https://w
 22. **RainToday:** Apakah hujan terjadi hari ini (Yes/No).
 23. **RainTomorrow:** Apakah diharapkan hujan besok (Yes/No).
 
+Data yang digunakan memliki ukuran **145460, 23**. Terdapat kolom yang berisikan nilai `null` atau `kosong`, Berikut ini adalah jumlah nilai kosong (*missing values*) pada setiap kolom dalam dataset:
+
+| Column          | Missing Values |
+|-----------------|----------------|
+| Date            | 0              |
+| Location        | 0              |
+| MinTemp         | 1,485          |
+| MaxTemp         | 1,261          |
+| Rainfall        | 3,261          |
+| Evaporation     | 62,790         |
+| Sunshine        | 69,835         |
+| WindGustDir     | 10,326         |
+| WindGustSpeed   | 10,263         |
+| WindDir9am      | 10,566         |
+| WindDir3pm      | 4,228          |
+| WindSpeed9am    | 1,767          |
+| WindSpeed3pm    | 3,062          |
+| Humidity9am     | 2,654          |
+| Humidity3pm     | 4,507          |
+| Pressure9am     | 15,065         |
+| Pressure3pm     | 15,028         |
+| Cloud9am        | 55,888         |
+| Cloud3pm        | 59,358         |
+| Temp9am         | 1,767          |
+| Temp3pm         | 3,609          |
+| RainToday       | 3,261          |
+| RainTomorrow    | 3,267          |
+
+Dataset ini memiliki nilai kosong yang signifikan pada beberapa kolom seperti *Evaporation*, *Sunshine*, *Cloud9am*, dan *Cloud3pm*, yang mungkin memerlukan penanganan lebih lanjut seperti imputasi atau penghapusan baris/kolom tergantung pada strategi pengolahan data yang diinginkan.
+
 ### correlation matrix heatmap plot
 Melihat apakah dari kolom yang ada terdapat korelasi antara kolom lain. ![Korelasi Matrik](/assets/KorelasiMatrik.png)
 
@@ -95,134 +119,58 @@ Melihat apakah dari kolom yang ada terdapat korelasi antara kolom lain. ![Korela
 Menganalisis tingkat curah hujan dari tahun 2008 hingga 2018. Dapat diilihat curah hujan selalu naik diawal tahun. ![Rainfall](/assets/Rainfall.png)
 
 ## Data Preparation
-### Data Cleaning
+Pada bagian ini, dijelaskan tahapan-tahapan persiapan data yang dilakukan untuk memastikan data siap digunakan dalam proses pemodelan. Berikut adalah tahapan lengkap dalam *Data Preparation*:
 
-1. **RainTomorrow**
-    - Karena kolom ini adalah target untuk diprediksi maka nilai kosong yang ada pada kolom ini akan dihapus.
+### 1. Data Cleaning
+   - **Proses**: Mengatasi nilai kosong (*missing values*) pada dataset. Kolom dengan nilai kosong diisi menggunakan teknik imputasi, seperti mengganti nilai kosong pada kolom numerik dengan nilai median atau rata-rata, dan nilai modus untuk kolom kategorikal.
+   - **Alasan**: Mengisi nilai kosong penting untuk menghindari gangguan pada proses pemodelan, karena beberapa algoritma tidak dapat bekerja dengan nilai kosong. Dengan mengatasi *missing values*, data menjadi lebih lengkap dan lebih representatif.
 
-2. **Numeric Columns**
-    - Membagi menjadi 3 cara yaitu imputasi menggunakan mean untuk distribusi normal, median untuk distribusi skewed dan random data untuk kolom `Cloud9am` dan `Cloud3pm`.
-    - Kolom dipisah sesuai jenis distribusinya kecuali kolom `Cloud9am` dan `Cloud3pm`.
-    - Membuat fungsi untuk masing-masing cara imputasinya.
+### 2. Outlier Handling dengan Winsorizer
+   - **Proses**: Menggunakan teknik *Winsorizing* untuk mengatasi *outliers* pada data numerik. Nilai ekstrem pada ujung distribusi diubah menjadi nilai persentil tertentu (misalnya, 1% dan 99%) agar tidak terlalu memengaruhi model.
+   - **Alasan**: Outlier dapat menyebabkan model menjadi kurang akurat, terutama dalam algoritma yang sensitif terhadap nilai ekstrem. Dengan *winsorizing*, distribusi data lebih stabil, dan model dapat belajar dari data dengan lebih efektif.
 
-3. **Object Columns**
-    - Melakukan imputasi pada nilai `NaN` dengan cara mengisinya dengan mode.
+### 3. Encoding dengan Label Encoder
+   - **Proses**: Menggunakan *Label Encoding* untuk mengubah kolom kategorikal menjadi nilai numerik. Kolom seperti `Location` dan `WindGustDir` diubah menjadi label numerik agar model dapat memprosesnya.
+   - **Alasan**: Algoritma machine learning tidak bisa bekerja dengan data non-numerik, sehingga encoding diperlukan untuk mengonversi data kategorikal ke dalam bentuk yang bisa dimengerti oleh model.
 
-4. **Correlation Columns**
-    - Melihat kolom apakah memiliki korelasi terhadap kolom lainnya menggunakan Correlation matrix.
+### 4. Normalization dengan RobustScaler
+   - **Proses**: Menerapkan *RobustScaler* untuk menormalkan data numerik dengan mengurangi nilai median dan membaginya dengan IQR (Interquartile Range). Ini membantu dalam menstabilkan distribusi data tanpa terpengaruh oleh outliers.
+   - **Alasan**: Normalisasi diperlukan agar semua fitur berada pada skala yang sama, terutama untuk algoritma yang sensitif terhadap perbedaan skala fitur. RobustScaler dipilih karena lebih tahan terhadap outliers dibandingkan scaler lainnya.
 
-**NOTE:** <br>
-Kolom yang memiliki distribusi Normal : `MinTemp`, `MaxTemp`, `WindGustSpeed`, `WindSpeed9am`, `WindSpeed3pm`, `Humidity3pm`, `Pressure9am`, `Pressure3pm`, `Cloud9am`, `Cloud3pm`, `Temp9am`, `Temp3pm`. <br><br>
-Kolom yang memiliki distribusi skewed : `Rainfall`, `Evaporation` <br> <br>
-
-#### Handling NaN Value
-- Kolom dengan jenis object akan di imputasi dengan `mode`
-- Kolom yang memiliki distribusi `Normal` akan di imputasi dengan `Mean`
-- Kolom yang memiliki distribusi `Skewed` akan di imputasi dengan `Median`
-- Khusus untuk kolom `Cloud9am` dan `Cloud3pm` akan di imputasi dengan `Random sample`
-
-### Outlier Handling
-1. **Inisialisasi Winsorizer untuk Distribusi Gaussian:**
-   - `handling_outlier_gaussian`: Menggunakan Winsorizer dengan metode distribusi gaussian untuk beberapa kolom numerik tertentu.
-   - `fold=3`: Menerapkan Winsorizing dengan menggantikan nilai outlier yang melebihi batas tiga kali deviasi standar.
-
-2. **Handling Outlier dengan Distribusi Gaussian:**
-   - Proses handling outlier dengan menggunakan Winsorizer pada distribusi gaussian.
-   - Membuat boxplot sebelum dan setelah handling outlier untuk kolom 'Pressure3pm' sebagai contoh.
-
-3. **Inisialisasi Winsorizer untuk Distribusi IQR:**
-   - `handling_outlier_skewed`: Menggunakan Winsorizer dengan metode distribusi IQR (Interquartile Range) untuk beberapa kolom numerik tertentu.
-
-4. **Handling Outlier dengan Distribusi IQR:**
-   - Proses handling outlier dengan menggunakan Winsorizer pada distribusi IQR.
-   - Membuat boxplot sebelum dan setelah handling outlier untuk kolom 'Rainfall' sebagai contoh.
-
-### Encoding
-1. **Menyimpan Nama Kolom Bertipe Objek:**
-   - `object_columns = df_ho.select_dtypes(include='object').columns.tolist()`: Menyimpan nama kolom bertipe objek.
-
-2. **Encoding Kolom Kategori menggunakan LabelEncoder:**
-   - `label_encoder = LabelEncoder()`: Inisialisasi objek LabelEncoder.
-   - Melakukan iterasi pada kolom-kolom bertipe objek dan melakukan encoding.
-   - Menyimpan dataset yang sudah diencode ke dalam variabel `df_encoded`.
-
-### Normalization
-1. **Definisi Feature Matrix dan Target Variable:**
-   - `fiture = df_encoded.drop(columns='RainTomorrow')`: Mengambil seluruh kolom kecuali 'RainTomorrow' sebagai feature matrix.
-   - `target = df_encoded['RainTomorrow']`: Mengambil kolom 'RainTomorrow' sebagai target variable.
-
-2. **Inisialisasi dan Scaling Data menggunakan RobustScaler:**
-   - `fiture_scalar = RobustScaler()`: Inisialisasi objek RobustScaler untuk melakukan scaling data.
-
-3. **Melakukan Scaling pada Data Fitur:**
-   - `fiture_scalar.fit(fiture)`: Melakukan fitting pada data fitur untuk menghitung median dan IQR.
-   - `scaled_fiture = fiture_scalar.transform(fiture)`: Melakukan scaling pada data fitur menggunakan RobustScaler.
-
-4. **Konversi Hasil Scaling Menjadi DataFrame:**
-   - `fiture = pd.DataFrame(scaled_fiture, columns=fiture.columns)`: Mengonversi hasil scaling menjadi DataFrame dengan nama kolom yang sesuai.
-
-### Split Data
-Ini bertanggung jawab untuk membagi dataset menjadi set pelatihan dan pengujian, langkah dasar dalam pengembangan model machine learning. Pembagian ini memungkinkan pelatihan dan evaluasi model pada set data yang berbeda.
-
-- Fungsi `train_test_split` dari modul `sklearn.model_selection` digunakan untuk melakukan pembagian data. Fungsi ini memiliki parameter sebagai berikut:
-   - `fiture`: Matriks fitur.
-   - `target`: Variabel target.
-   - `test_size`: Proporsi data yang dialokasikan untuk set pengujian. Dalam kasus ini, diatur menjadi 30% (0,3).
-   - `random_state`: Seed untuk generator angka acak untuk memastikan reproduktibilitas.
-
-### Alasan Menggunakan Tahapan Tersebut
-1. **Handling Missing Values:**
-   - Dilakukan pengecekan dan penanganan nilai yang hilang pada kolom-kolom tertentu, seperti menggunakan imputasi dengan mean, median, atau modus.
-2. **Outlier Handling:**
-   - Untuk menghandle outlier menggunakan winsorizer dengan foldnya 3.
-   - Yang bertujuan untuk menjaga tetap adanya outlier dengan batas tertentu.
-   - Yang bermaksud data cuaca memiliki rentan data yang mempunyai kelonjakan atau perubahan secara ekstrem contohnya seperti badai.
-
-3. **Data Encoding:**
-   - Data dibuat dari objek menjadi numerik menggunakan `LabelEncoder`.
-
-4. **Data Normalisasi:**
-   - Bertujuan untuk menyamakan skala data yang digunakan.
+### 5. Split Data (70:30)
+   - **Proses**: Memisahkan data menjadi data latih (*train*) dan data uji (*test*) dengan perbandingan 70:30. Data latih digunakan untuk melatih model, sedangkan data uji digunakan untuk mengevaluasi performa model.
+   - **Alasan**: Split data diperlukan untuk memastikan model tidak hanya belajar dari data latih, tetapi juga mampu bekerja dengan baik pada data baru yang belum pernah dilihat sebelumnya. Pembagian ini juga membantu mengevaluasi generalisasi model pada data uji.
+   
+Setiap tahapan di atas dilakukan secara berurutan untuk memastikan data siap digunakan dalam proses pemodelan.
 
 ## Modeling
-ini bertanggung jawab untuk mendefinisikan dan melatih dua model machine learning, yaitu Logistic Regression dan Support Vector Machine (SVM).
+Bagian ini menjelaskan proses definisi dan pelatihan dua model machine learning untuk memprediksi kemungkinan hujan, yaitu Logistic Regression dan Support Vector Machine (SVM). Berikut adalah penjelasan masing-masing model beserta parameter yang digunakan:
 
-**Penjelasan Kode**:
+### 1. Logistic Regression Model
+   - **Cara Kerja**: Logistic Regression adalah algoritma klasifikasi linier yang digunakan untuk memperkirakan probabilitas suatu data termasuk dalam kategori tertentu (hujan/tidak hujan). Algoritma ini menggunakan fungsi logistik atau sigmoid untuk memetakan nilai output ke dalam rentang 0 hingga 1. Logistic Regression cocok untuk kasus klasifikasi biner seperti ini.
+   - **Parameter yang Digunakan**:
+     - `solver='liblinear'`: Solver ini cocok untuk dataset kecil hingga menengah, khususnya untuk klasifikasi biner.
+     - `C=0.001`: Nilai regularisasi yang lebih rendah (kekuatan regularisasi yang lebih besar), bertujuan untuk mencegah *overfitting*.
+     - `random_state=42`: Seed untuk memastikan hasil eksperimen konsisten.
+     - `max_iter=100`: Batas maksimum iterasi untuk konvergensi model.
+  
+### 2. Support Vector Machine (SVM) Model
+   - **Cara Kerja**: SVM bekerja dengan mencari garis batas terbaik (hyperplane) yang memisahkan dua kelas dengan margin maksimal. SVM sangat kuat dalam menangani data yang memiliki batasan kelas yang tidak linier dan cocok untuk kasus klasifikasi pada data yang kompleks seperti data cuaca. Dengan memilih kernel linear, SVM berusaha memaksimalkan jarak antara dua kelas pada ruang fitur.
+   - **Parameter yang Digunakan**:
+     - `kernel='linear'`: Kernel linear dipilih karena sering efektif pada data yang distribusinya dapat dipisahkan secara linear.
+     - `C=1.0`: Parameter ini mengontrol keseimbangan antara memaksimalkan margin dan meminimalkan kesalahan klasifikasi.
+     - `random_state=42`: Seed untuk memastikan hasil yang konsisten.
+     - `gamma=0.1`: Parameter yang mengontrol ukuran *influence* dari contoh tunggal. Gamma rendah berarti radius pengaruh besar, gamma tinggi berarti radius pengaruh kecil.
 
-1. **Logistic Regression Model**:
-   - Model Logistic Regression dibuat menggunakan kelas `LogisticRegression` dari modul `sklearn.linear_model`.
-   - Parameter yang digunakan:
-     - `solver='liblinear'`: Algoritma solver yang digunakan untuk melatih model.
-     - `C=0.001`: Kebalikan dari kekuatan regularisasi; nilai yang lebih rendah mengindikasikan regularisasi yang lebih kuat.
-     - `random_state=42`: Seed untuk generator angka acak untuk memastikan reproduktibilitas.
-     - `max_iter=100`: Jumlah iterasi maksimum dalam melatih model.
+### **Kelebihan dan Kekurangan Algoritma yang Digunakan**
 
-2. **Support Vector Machine (SVM) Model**:
-   - Model SVM dibuat menggunakan kelas `SVC` dari modul `sklearn.svm`.
-   - Parameter yang digunakan:
-     - `kernel='linear'`: Jenis kernel yang digunakan, dalam hal ini, kernel linear.
-     - `C=1.0`: Parameter ketegangan yang mengontrol tingkat toleransi terhadap kesalahan pelatihan.
-     - `random_state=42`: Seed untuk generator angka acak untuk memastikan reproduktibilitas.
-     - `gamma=0.1`: Parameter kernel SVM, gamma.
+- **Logistic Regression**:
+   - **Kelebihan**: Efisien, cepat dalam pelatihan, dan mudah diinterpretasi karena model linier. Logistic Regression cenderung bekerja baik pada data yang dapat dipisahkan secara linier.
+   - **Kekurangan**: Kurang optimal pada data yang tidak memiliki pola linier atau data dengan interaksi kompleks.
 
-### **Kelebihan dan Kekurangan Algoritma yang Digunakan:**
-
-- *Logistic Regression*:  
-  Kelebihan: Efisien, cepat, dan mudah diinterpretasi, khususnya pada dataset linier.  
-  Kekurangan: Tidak optimal untuk dataset yang kompleks atau tidak linier.
-
-- *Support Vector Machine (SVM)*:  
-  Kelebihan: Kuat dalam menangani dataset yang kompleks dan baik dalam memisahkan data pada batas kelas yang tidak linier.  
-  Kekurangan: Membutuhkan waktu komputasi lebih tinggi pada dataset besar.
-
-**Pemilihan Model Terbaik:**
-Berdasarkan hasil evaluasi, *SVM* dipilih sebagai model terbaik karena memberikan akurasi yang lebih tinggi dibandingkan *Logistic Regression*. SVM juga lebih mampu memisahkan kelas secara efektif pada data yang kompleks seperti data cuaca.
-
-### Improvement pada Data
-Peningkatan akurasi model dilakukan dengan teknik penyeimbangan data menggunakan *SMOTE* dan *class_weight* pada model SVM:
-- **SMOTE (Synthetic Minority Over-sampling Technique)**: Digunakan untuk menangani ketidakseimbangan kelas dengan membuat sampel sintetis dari kelas minoritas.
-- **class_weight='balanced'**: Mengatur bobot kelas secara otomatis untuk memperhitungkan ketidakseimbangan, sehingga model lebih memperhatikan kelas yang kurang dominan.
-
+- **Support Vector Machine (SVM)**:
+   - **Kelebihan**: Sangat baik dalam memisahkan data pada batas kelas yang kompleks dan menangani data yang tidak linier.
+   - **Kekurangan**: Membutuhkan lebih banyak komputasi pada dataset besar dan waktu pelatihan lebih lama dibandingkan Logistic Regression.
 
 ## Evaluation
 Pada bagian ini, kami menggunakan beberapa metrik evaluasi untuk menilai kinerja model prediksi hujan harian yang dibangun menggunakan algoritma *Support Vector Machine (SVM)* dan *Logistic Regression*. Evaluasi dilakukan berdasarkan metrik *Accuracy*, *Precision*, *Recall*, dan *F1-Score*, yang dipilih karena relevan dengan konteks klasifikasi biner dalam data cuaca yang tidak seimbang.
@@ -246,12 +194,30 @@ Pada bagian ini, kami menggunakan beberapa metrik evaluasi untuk menilai kinerja
    `F1-Score = 2 * (Precision * Recall) / (Precision + Recall)`
 
 
+## Hasil Evaluasi dan Pembahasan Terhadap Problem Statement dan Goals Proyek
+
 ### Hasil Proyek Berdasarkan Metrik Evaluasi
+Berdasarkan hasil evaluasi performa kedua model, yaitu Support Vector Machine (SVM) dan Logistic Regression (LR), berikut adalah ringkasan skor akurasi dan metrik evaluasi lainnya dari masing-masing model setelah dilakukan oversampling menggunakan SMOTE serta pengaturan class_weight:
 
-Dari hasil evaluasi, model *Support Vector Machine (SVM)* menunjukkan performa terbaik dibandingkan dengan model *Logistic Regression* setelah dilakukan oversampling dengan *SMOTE* dan pengaturan *class_weight*. Berikut adalah hasil evaluasi berdasarkan metrik yang digunakan:
-- **Akurasi**: Model SVM memiliki akurasi yang lebih tinggi dibanding Logistic Regression, mengindikasikan prediksi yang lebih akurat secara keseluruhan.
-- **Precision dan Recall**: Model SVM memiliki precision yang tinggi, mengurangi risiko prediksi positif palsu, serta recall yang memadai, menangkap sebagian besar kasus hujan yang sebenarnya terjadi.
-- **F1-Score**: Dengan nilai F1-Score yang lebih tinggi pada SVM, model ini berhasil mencapai keseimbangan antara precision dan recall, yang ideal untuk kasus prediksi hujan yang sensitif terhadap kesalahan positif dan negatif.
+| Model          | Oversampling | class_weight | Akurasi Training | Akurasi Uji | Precision (0) | Recall (0) | F1-score (0) | Precision (1) | Recall (1) | F1-score (1) |
+|----------------|--------------|--------------|-------------------|-------------|---------------|------------|--------------|---------------|------------|--------------|
+| SVM            | SMOTE        | Balanced     | 0.787            | 0.786       | 0.92          | 0.80       | 0.85         | 0.51          | 0.75       | 0.61         |
+| Logistic Reg.  | SMOTE        | Balanced     | 0.785            | 0.783       | 0.92          | 0.79       | 0.85         | 0.51          | 0.75       | 0.61         |
 
-Secara keseluruhan, model SVM yang telah dioptimalkan dengan *SMOTE* dan *class_weight* menunjukkan kinerja terbaik untuk memprediksi kemungkinan hujan keesokan harinya dengan akurasi dan keseimbangan metrik yang sesuai.
+### Pembahasan Goal Utama Berdasarkan Hasil Prediksi
+Model SVM menunjukkan performa lebih unggul dibandingkan Logistic Regression, terutama setelah dioptimalkan dengan oversampling menggunakan SMOTE dan pengaturan class_weight. Berdasarkan hasil ini, model SVM dapat dipilih sebagai model final untuk mendukung kebutuhan prediksi cuaca yang akurat. Berikut adalah pembahasan hasil model dalam konteks tujuan proyek dan relevansi untuk mendukung operasional transportasi, infrastruktur, mitigasi bencana, dan perencanaan perkotaan:
+
+1. **Apakah prediksi hujan harian dapat mengurangi risiko dan meningkatkan keamanan dalam operasional transportasi dan infrastruktur?**
+   - Dengan precision yang lebih tinggi (0.92) pada kelas negatif (tidak hujan), model SVM dapat mengurangi risiko prediksi positif palsu yang tidak akurat, yang berarti sistem tidak perlu memberikan peringatan atau penjadwalan ulang transportasi jika tidak diperlukan.
+   - Recall yang relatif tinggi pada kelas positif (hujan) menunjukkan bahwa model dapat mengidentifikasi mayoritas situasi hujan yang sebenarnya, sehingga prediksi ini dapat digunakan sebagai bagian dari mitigasi risiko untuk pengaturan operasional transportasi yang aman.
+
+2. **Seberapa efektif prediksi cuaca yang akurat dalam mendukung mitigasi bencana dan perencanaan perkotaan di Australia?**
+   - Dengan akurasi 0.79 dan F1-score pada kelas hujan sebesar 0.61, model dapat membantu pemerintah lokal dan badan terkait dalam mengambil keputusan mitigasi bencana yang lebih proaktif. Keseimbangan antara recall dan precision ini menunjukkan bahwa prediksi cuaca dapat memberi gambaran yang memadai mengenai kemungkinan hujan, mendukung kesiapsiagaan bencana banjir, serta memberi masukan pada pengelolaan drainase dan pembangunan fasilitas publik.
+   - Precision tinggi pada prediksi tidak hujan juga mendukung perencanaan perkotaan di mana kegiatan konstruksi dan pengelolaan infrastruktur dapat direncanakan dengan lebih efisien, meminimalkan gangguan yang tidak perlu karena peringatan cuaca yang kurang akurat.
+
+3. **Goal Proyek Secara Keseluruhan**
+   - Dengan ketepatan prediksi cuaca yang ditunjukkan oleh model SVM, proyek ini berhasil mencapai tujuannya untuk memberikan prediksi cuaca yang andal sebagai alat bantu dalam operasional transportasi, perencanaan perkotaan, dan mitigasi risiko cuaca di Australia. Model ini memberikan keseimbangan performa yang cukup baik untuk memenuhi tujuan tersebut, meskipun performa pada kelas positif (hujan) masih bisa ditingkatkan dengan eksplorasi fitur lebih lanjut atau tuning tambahan untuk skenario cuaca ekstrem.
+
+Kesimpulannya, model SVM yang dioptimalkan ini telah mencapai sebagian besar tujuan proyek dengan hasil yang cukup memadai, khususnya dalam mendukung operasional transportasi dan mitigasi bencana berbasis prediksi cuaca. Ke depannya, pengembangan lebih lanjut dapat difokuskan untuk meningkatkan recall pada kelas hujan, memastikan prediksi lebih akurat pada kondisi cuaca yang lebih sulit diidentifikasi.
+
 
